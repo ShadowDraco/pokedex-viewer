@@ -1,17 +1,18 @@
 html {
-	width: 100vw;
+  width: 100vw;
 }
 
 body {
-	width: 100vw;
+  width: 100vw;
+  overflow-x: hidden;
 }
 
 #root {
-	padding: none;
-	margin: none;
-	width: 100vw;
+  padding: none;
+  margin: none;
+  width: 100vw;
 }
 
 .App {
-	width: 100%;
+  width: 100%;
 }
