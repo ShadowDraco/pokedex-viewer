@@ -17,9 +17,23 @@ app.get('/', (req, res) => {
 	res.json({ message: 'hello from:', from: 'admin' }).status(200)
 })
 
-app.get('/get', (req, res) => {
-	console.log('user got got')
-	res.json({ message: 'get got loser', from: 'admin' }).status(200)
+const likes = {}
+for (let i = 0; i < 100; i++) {
+	likes[i] = 0
+}
+
+app.get('/pokemon/likes/:id', (req, res) => {
+	let likeValue
+	likeValue = likes[req.params.id] ? likes[req.params.id] : 0
+
+	res.json({ likes: likeValue }).status(200)
+})
+
+app.put('/pokemon/like/:id', (req, res) => {
+	let id = req.params.id
+	likes[id] = likes[id] + 1
+
+	res.json({ message: 'liked! ', from: 'admin' }).status(200)
 })
 
 app.get('*', (req, res) => {

@@ -1,59 +1,52 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import axios from 'axios'
 import './App.css'
 
-import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { useEffect, useState } from 'react'
 
-import { Button, chakra, Box, Text } from '@chakra-ui/react'
-import { motion } from 'framer-motion'
 import PokemonCard from './components/PokemonCard'
 
+import { Button, Flex, Grid, GridItem, useColorMode } from '@chakra-ui/react'
+import Pokedex from './components/Pokedex'
+
 function App() {
+	const { colorMode, toggleColorMode } = useColorMode('dark')
 	const queryClient = new QueryClient()
 
-	const [count, setCount] = useState(0)
-	const [response, setResponse] = useState({})
+	const [pokedexColumns, setPokedexColumns] = useState(
+		Math.floor(window.innerWidth / 200)
+	)
 
-	const getGot = async () => {
-		axios.get('http://localhost:3000/get').then(response => {
-			setResponse(response.data)
-			console.log(response.data, count)
-		})
+	useEffect(() => {
+		const handleWindowResize = () => {
+			setPokedexColumns(Math.floor(window.innerWidth / 200))
+		}
 
-		setCount(prev => {
-			return prev + 1
-		})
-	}
+		window.addEventListener('resize', handleWindowResize)
+
+		return () => {
+			window.removeEventListener('resize', handleWindowResize)
+		}
+	})
 
 	return (
-		<>
-			<chakra.h1 color={'blue.100'}>Wanna Get got?</chakra.h1>
-			<div className='card'>
-				<Button
-					onClick={getGot}
-					as={motion.button}
-					initial={{ opacity: 0, scale: 0.5 }}
-					animate={{ opacity: 1, scale: 1 }}
-					transition={{ duration: 2 }}
-				>
-					you got got {count} times
-				</Button>
-				<chakra.h3
-					bgClip={'text'}
-					bgGradient='linear(to-r, red.500, blue.600)'
-					color='transparent'
-					fontSize={25}
-				>
-					{response?.message}
-				</chakra.h3>
-			</div>
+		<Flex
+			width={'95%'}
+			className='App'
+			padding={3}
+			margin={0}
+			wrap={'wrap'}
+			overflowX={'hidden'}
+			justifyContent={'center'}
+			minWidth={400}
+		>
+			<Button onClick={toggleColorMode} margin={5}>
+				Toggle {colorMode === 'light' ? 'Dark' : 'Light'}
+			</Button>
 
 			<QueryClientProvider client={queryClient}>
-				<PokemonCard name='charmander' />
+				<Pokedex pokedexColumns={pokedexColumns} />
 			</QueryClientProvider>
-		</>
+		</Flex>
 	)
 }
 
