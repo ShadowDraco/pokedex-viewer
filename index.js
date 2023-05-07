@@ -4,6 +4,7 @@ const app = express()
 const cors = require('cors')
 // include dotenv
 require('dotenv').config()
+const mongoose = require('mongoose')
 
 // set the port
 const port = process.env.PORT || 8080
@@ -12,21 +13,26 @@ const port = process.env.PORT || 8080
 app.use(express.json())
 app.use(cors())
 
+mongoose.connect(process.env.MONGODB_URI, {
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+})
+
 app.get('/', (req, res) => {
-  console.log('user at home route')
-  res.json({ message: 'hello from:', from: 'admin' }).status(200)
+	console.log('user at home route')
+	res.json({ message: 'hello from:', from: 'admin' }).status(200)
 })
 
 const pokemonRoute = require('./routes/pokemonRoute')
 app.use('/pokemon', pokemonRoute)
 
 app.get('*', (req, res) => {
-  console.log('user trying route that does not exist')
-  res
-    .json({ message: 'That page does not exist :)', from: 'admin' })
-    .status(404)
+	console.log('user trying route that does not exist')
+	res
+		.json({ message: 'That page does not exist :)', from: 'admin' })
+		.status(404)
 })
 
 app.listen(port, (req, res) => {
-  console.log(`listening on port: ${port}`)
+	console.log(`listening on port: ${port}`)
 })

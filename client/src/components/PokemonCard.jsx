@@ -1,12 +1,17 @@
-import React, { useState, useEffect } from 'react'
+import { useState } from 'react'
 import PropTypes from 'prop-types'
 
 import { motion } from 'framer-motion'
 import { useQueries } from 'react-query'
 
+import { useBackgroundPosition } from '../hooks/useBackgroundPosition'
 import backgrounds from '../lib/pokemon/cardBackgrounds'
-import { fetchPokemonData } from '../lib/pokemon/fetchPokemonData'
-import { fetchPokemonLikes } from '../lib/pokemon/fetchPokemonLikes'
+
+import {
+	fetchPokemonData,
+	fetchPokemonLikes,
+	addLike,
+} from '../lib/pokemon/pokemonLikes'
 import uppercaseFirstLetter from '../lib/utils/uppercaseFirstLetter'
 
 import { AiOutlineHeart } from 'react-icons/ai'
@@ -21,7 +26,6 @@ import {
 	Image,
 	useColorMode,
 } from '@chakra-ui/react'
-import axios from 'axios'
 
 PokemonCard.propTypes = {
 	name: PropTypes.string.isRequired,
@@ -29,43 +33,12 @@ PokemonCard.propTypes = {
 }
 
 export default function PokemonCard(props) {
-	const { colorMode } = useColorMode()
+	const { colorMode } = useColorMode() // chakra color mode
+
 	const [backgroundIndex] = useState(
 		Math.round(Math.random() * Math.floor(backgrounds.length - 1))
 	)
-
-	const [mousePosition, setMousePosition] = useState({
-		x: 0,
-		y: 0,
-	})
-	const [backgroundPositionX, setBackgroundPositionX] = useState(50)
-
-	const addLike = async () => {
-		await axios
-			.put(`http://localhost:3000/pokemon/like/${props.id + 1}`)
-			.then(res => {
-				pokemonLikes.refetch()
-			})
-	}
-
-	useEffect(() => {
-		const updateMousePosition = e => {
-			setMousePosition({
-				x: e.clientX,
-				y: e.clientY,
-			})
-
-			setBackgroundPositionX(
-				e.clientX / (window.innerWidth / 5) + window.innerWidth / 2
-			)
-		}
-
-		window.addEventListener('mousemove', updateMousePosition)
-
-		return () => {
-			window.removeEventListener('mousemove', updateMousePosition)
-		}
-	}, [])
+	const backgroundPositionX = useBackgroundPosition()
 
 	const [pokemonData, pokemonLikes] = useQueries([
 		{
@@ -90,8 +63,8 @@ export default function PokemonCard(props) {
 	return (
 		<Card
 			as={motion.div}
-			maxWidth={200}
-			minWidth={150}
+			maxWidth={180}
+			minWidth={120}
 			maxHeight={320}
 			backgroundImage={backgrounds[backgroundIndex]}
 			backgroundPosition={`${backgroundPositionX}% 50%`}
@@ -164,7 +137,7 @@ export default function PokemonCard(props) {
 						whileTap={{ scale: 0.8 }}
 						direction={'column'}
 						maxWidth={30}
-						onClick={addLike}
+						onClick={() => addLike(props.id, pokemonLikes.refetch)}
 					>
 						<AiOutlineHeart size={30} color='red' />
 						<Text color='white'>
